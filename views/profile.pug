@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h1 Welcome #{user.username}!
+    h2 _id:&nbsp;
+      small(style='color: blue') #{user._id}
+    h2 password:&nbsp;
+      small(style='color: blue') #{user.password}
+    a(href='/') home

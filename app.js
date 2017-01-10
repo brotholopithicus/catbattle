@@ -4,8 +4,9 @@ const favicon = require('serve-favicon');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const session = require('express-session');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
 const index = require('./routes/index');
 const users = require('./routes/users');
@@ -17,15 +18,20 @@ const app = express();
 mongoose.connect('mongodb://localhost/catbattle');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: '));
-db.once('open', () => console.log('connection open'));
 
 // session config
 app.use(session({
     secret: 'poptart kitty',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }
+    resave: true,
+    saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: db })
 }));
+
+// make user data available in templates
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

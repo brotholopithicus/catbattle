@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Register
+    form(method='POST', action='/users/signup')
+        input(type='text', name='username', placeholder='Username')
+        input(type='password', name='password', placeholder='Password')
+        input(type='password', name='confirmPassword', placeholder='Confirm Password')
+        input#registerButton(type='submit')
+    script(src='js/register.ctrl.js')

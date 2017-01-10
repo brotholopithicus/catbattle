@@ -1,15 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const getCats = require('../middleware/getCats');
-const setCats = require('../middleware/setCats');
 
 const User = require('../models/User');
 const Cat = require('../models/Cat');
 
-const path = require('path');
-const fs = require('fs');
-const catPath = path.resolve('./data/cats.json');
+const restricted = require('../middleware/restricted');
+const activeSession = require('../middleware/activeSession');
 
 let storage = multer.memoryStorage();
 let upload = multer({
@@ -18,7 +15,9 @@ let upload = multer({
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Cat Tinder' });
+    let data = { title: 'Cat Tinder' };
+    console.log(req.session);
+    res.render('index', data);
 });
 
 /* GET post new cat page. */
@@ -27,17 +26,33 @@ router.get('/post', (req, res, next) => {
 });
 
 /* GET rate cats page */
-router.get('/rate', (req, res, next) => {
-    let catList = getCats();
-    setCats(catList, (err, cats) => {
-        if (err) return next(err);
-        res.render('rate', { cats });
-    });
+router.get('/rate', restricted, (req, res, next) => {
+    res.render('rate');
 });
 
-/* GET login / signup page */
-router.get('/login', (req, res, next) => {
+/* GET login page */
+router.get('/login', activeSession, (req, res, next) => {
     res.render('login');
+});
+
+/* GET signup page */
+router.get('/signup', activeSession, (req, res, next) => {
+    res.render('register');
+});
+
+/* GET logout page */
+router.get('/logout', (req, res, next) => {
+    if (req.session) {
+        req.session.destroy(err => {
+            if (err) return next(err);
+            return res.redirect('/');
+        });
+    }
+});
+
+/* GET profile page */
+router.get('/profile', (req, res, next) => {
+    res.render('profile');
 });
 
 /* POST new cat document */
@@ -55,27 +70,6 @@ router.post('/upload', upload.single('photo'), (req, res, next) => {
 router.get('/test', (req, res, next) => {
     Cat.findOne({ owner: 'James' }, (err, cat) => {
         if (!err && cat) res.send(new Buffer(cat.binary));
-    });
-});
-
-router.post('/vote', (req, res, next) => {
-    let selected = req.body.selected;
-    let catList = fs.readFileSync(catPath);
-    catList = JSON.parse(catList);
-    console.log(catList);
-    catList.forEach(cat => {
-        if (cat.cat === selected) {
-            console.log('match!');
-            console.log(cat.votes);
-            cat.votes++;
-            console.log(cat.votes);
-        }
-    });
-    catList = JSON.stringify(catList);
-    fs.writeFile(catPath, catList, (err) => {
-        if (err) return next(err);
-        console.log('saved');
-        res.redirect('/rate');
     });
 });
 

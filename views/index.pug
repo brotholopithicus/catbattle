@@ -2,11 +2,15 @@ extends layout
 
 block content
     h1= title
-    ul
-        li
-            a(href='/post') Add Your Cat
-        li
-            a(href='/rate') Rate Cats
-        li
-            a(href='/login') Login
-    img(src='/test')
+    h2 Hello Friend!
+    if !user
+        p
+            | Would you like to&nbsp;
+            a(href='/login') login
+            | &nbsp;or&nbsp;
+            a(href='/signup') register
+            | ?
+    else
+
+        a(href='/profile') profile&nbsp;
+        a(href='/logout') logout

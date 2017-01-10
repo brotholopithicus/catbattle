@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
-const fs = require('fs');
 
-router.get('/:cat', (req, res, next) => {
-  res.sendFile(path.resolve('./uploads/' + req.params.cat));
+router.get('/', (req, res, next) => {
+    res.send('You have a butt on your face.');
 });
 
 module.exports = router;
