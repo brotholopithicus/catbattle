@@ -1,0 +1,18 @@
+extends layout
+
+block content
+    .page-container
+        .image-container
+            figure.image#left
+                img.cat(data-cat='catOne', src=`/images/${cats.catOne}`)
+                figcaption Cat One
+            figure.image#right
+                img.cat(data-cat='catTwo', src=`/images/${cats.catTwo}`)
+                figcaption Cat Two
+        form(method='POST', action='/vote')
+          input#catOne(type='radio', name='selected', value=cats.catOne)
+          input#catTwo(type='radio', name='selected', value=cats.catTwo)
+          input#vote(type='submit', disabled)
+
+block scripts
+    script(src='/js/app.js')
